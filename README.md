@@ -1,1 +1,1 @@
-# vusqua-application
+# vusqua-crawler
