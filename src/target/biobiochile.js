@@ -1,9 +1,9 @@
+const puppeteer = require("puppeteer");
+
 const biobiochile = {
   url: "https://www.biobiochile.cl",
-  browser: null,
-  page: null,
-  crawling: async () => {
-    
+  crawling: async (page) => {
+    await page.goto(biobiochile.url);
   }
 }
 

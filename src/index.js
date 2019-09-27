@@ -12,10 +12,11 @@ const soychile = require("./target/soychile.js");
 
 (async () => {
 
-  await vusqua.initialize(biobiochile.url);
+  await vusqua.initialize();
 
-  await vusqua.startCrawling(biobiochile.crawling)
+  await biobiochile.crawling(vusqua.page)
   
+  // await vusqua.end();
 
   // await naver.startCrawling('politics', categories.politics, 1);
 
