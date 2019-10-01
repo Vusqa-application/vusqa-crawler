@@ -14,7 +14,7 @@ const soychile = require("./target/soychile.js");
 
   await vusqua.initialize();
 
-  await biobiochile.crawling(vusqua.page)
+  await biobiochile.start_crawling(vusqua.page, 3);
   
   // await vusqua.end();
 
