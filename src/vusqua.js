@@ -5,18 +5,23 @@ const converter = require("./json-to-csv-converter.js");
 
 const vusqua = {
   browser: null,
+  context: null,
   page: null,
 
   initialize: async () => {
     vusqua.browser = await puppeteer.launch({
-      headless: false
+      args: [
+        '--no-sandbox'
+      ]
     });
 
-    vusqua.page = await vusqua.browser.newPage();
+    vusqua.context = await vusqua.browser.createIncognitoBrowserContext();
+
+    vusqua.page = await vusqua.context.newPage();
     
   },
   end: async () => {
-    vusqua.page.close();
+    vusqua.context.close();
   },
   saveData: async () => {
 
