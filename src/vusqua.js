@@ -10,6 +10,7 @@ const vusqua = {
 
   initialize: async () => {
     vusqua.browser = await puppeteer.launch({
+      // headless: false
       args: [
         '--no-sandbox'
       ]
