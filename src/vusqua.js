@@ -1,8 +1,6 @@
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 
-const converter = require("./json-to-csv-converter.js");
-
 const vusqua = {
   browser: null,
   context: null,
@@ -10,10 +8,10 @@ const vusqua = {
 
   initialize: async () => {
     vusqua.browser = await puppeteer.launch({
-      // headless: false
-      args: [
-        '--no-sandbox'
-      ]
+      headless: false
+      // args: [
+      //   '--no-sandbox'
+      // ]
     });
 
     vusqua.context = await vusqua.browser.createIncognitoBrowserContext();

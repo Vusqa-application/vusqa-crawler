@@ -51,7 +51,6 @@ const biobiochile = {
         
         const news_thumnail_blocks = await page.$$('#container1 > .content .small-content > .noticia').catch(err => {
           console.log('cannot reach to thumnail contents!')
-          console.log(err);
           return null;
         });
 
@@ -61,13 +60,11 @@ const biobiochile = {
 
           const [thumnail_date, thumnail_time] = await thumnail_block.$$eval('div[class="col-xs-2 fecha"] p', elements => elements.map(e => e.innerText)).catch(err => {
             console.log('thumnail_date and thumnail_time are missing!')
-            console.log(err);
             return null;
           });
 
           const thumnail_author = await thumnail_block.$eval('p[class="autor"] > a', element => element.innerText).catch(err => {
             console.log('thumnail_author is missing!')
-            console.log(err);
             return null;
           });
 
@@ -75,7 +72,6 @@ const biobiochile = {
             return [ element.href, element.innerText ];
           }).catch(err => {
             console.log('thumnail_link and thumnail_title are missing!')
-            console.log(err);
             return null;
           });
 
@@ -83,7 +79,6 @@ const biobiochile = {
             return element.style['background-image'].replace('url("//', "").replace('")', "");    
           }).catch(err => {
             console.log('thumnail_image_link is missing!')
-            console.log(err);
             return null;
           });
 
@@ -105,13 +100,14 @@ const biobiochile = {
           return element.innerText;
         }).catch(err => {
           console.log('pagination is missing!');
-          console.log(err);
           return null;
         });
 
         console.log('pagination : ', limit);
 
-        await biobiochile.thumnail_crawling(page, category, limit + 1);
+        await biobiochile.thumnail_crawling(page, category, limit + 1).catch(err => {
+          console.log(`pagination : ${limit + 1} thumnail crawling failed`)
+        });
 
         break;
       
@@ -126,53 +122,56 @@ const biobiochile = {
     // 후 미칠듯
     
     for (let thumnail of biobiochile.thumnail_lists[category]) {
-      await page.goto(thumnail.thumnail_link);
+      const connection_success = await page.goto(thumnail.thumnail_link).then(res => {
+        return true;
+      }).catch(err => {
+        console.log('this page cannot be reached');
+        return false;
+      });
+
+      if (connection_success === false) {
+        console.log(thumnail.thumnail_link);
+        continue;
+      }
 
       const post_data = await page.$('#content-general-nota div[class^="caja-blanca"]').catch(err => {
         console.log('cannot reach to the post contents');
-        console.log(err);
         return null;
       });
 
       const post_region = await post_data.$eval('div[class="categoria-titulo-nota"]', element => element.innerText).catch(err => {
         console.log('post region is missing!');
-        console.log(err);
         return null;
       });
       const post_date = await post_data.$eval('div[class="nota-fecha am-hide"]', element => element.innerText).catch(err => {
         console.log('post date is missing!');
-        console.log(err);
         return null;
       });
       const post_title = await post_data.$eval('div[class="nota-titular robotos"]', element => element.innerText).catch(err => {
         console.log('post title is missing!')
-        console.log(err);
         return null;
       });
 
       const post_image_link = await post_data.$eval('div[class="nota-container"] > div[class="nota-body"] > div[class="nota-img nota-img-chica"] img', element => element.src).catch(err => {
         console.log('image link is missing!')
-        console.log(err);
         return null;
       });
       
       const post_video_link = await post_data.$eval('div[class="nota-container"] > div[class="nota-body"] iframe[id="vrudo-destacado"]', element => {
         return element.contentWindow.document.body.querySelector('video > source').src;
       }).catch(err => {
-        console.log('video is wrong!')
-        console.log(err);
+        console.log('video is missing!')
         return null;
       });
       
 
       const [post_author, post_provider ] = await post_data.$eval('div[class="nota-autor"]', element => element.innerText.split('\n')).catch(err => {
         console.log('post_author and post_provider are missing!')
-        console.log(err);
         return null;
       });
+
       const post_content = await post_data.$eval('div[class="nota-container"] > div[class="nota-body"] > div[class="nota-contenido-fondo"] > div[class^="nota-contenido"]', element => element.innerText).catch(err => {
         console.log('content is missing!')
-        console.log(err);
         return null;
       });
 
@@ -183,6 +182,7 @@ const biobiochile = {
         post_author,
         post_provider,
         post_image_link,
+        post_video_link,
         post_content
       }
 
@@ -199,15 +199,21 @@ const biobiochile = {
 
     for (let category in biobiochile.general_categories) {
       
-      await page.goto(biobiochile.url + biobiochile.general_categories[category]);
+      await page.goto(biobiochile.url + biobiochile.general_categories[category]).catch(err => {
+        console.log('this page cannot be reached');
+      });
 
-      await biobiochile.thumnail_crawling(page, category, 1);
+      await biobiochile.thumnail_crawling(page, category, 1).catch(err => {
+        console.log(`${category} thumnail crawling failed`);
+      });
 
-      console.log('all thumnail crawling is done');
+      console.log(`${category} thumnail crawling is done`);
 
-      await biobiochile.post_crawling(page, category);
+      await biobiochile.post_crawling(page, category).catch(err => {
+        console.log(`${category} post crawling failed`);
+      });
 
-      console.log('all post crawling is done');
+      console.log(`${category} post crawling is done`);
       
     }
 
