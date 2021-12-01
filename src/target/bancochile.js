@@ -56,8 +56,6 @@ const bancochile = {
 
         for (thumnail_block of news_thumnail_blocks) {
 
-          // 아 맵으로 해야되는구나 $$나 $$eval은
-
           const [thumnail_date, thumnail_time] = await thumnail_block.$$eval('div[class="col-xs-2 fecha"] p', elements => elements.map(e => e.innerText)).catch(err => {
             console.log('thumnail_date and thumnail_time are missing!')
             return null;
@@ -93,8 +91,6 @@ const bancochile = {
           biobiochile.thumnail_lists[category].push(thumnail_obj);
         }
 
-        // 페이지네이션
-
         const pagination = await page.$eval('#container1 > .content .small-content nav[aria-label="Page navigation example"] li[class="page-item active"]', element => {
           element.nextElementSibling.children[0].click();
           return element.innerText;
@@ -112,15 +108,9 @@ const bancochile = {
         break;
       
       console.log('post has been processed');
-
     }
   },
-  post_crawling: async (page, category) => {
-
-    // 완전히 다른 포스트 구조도 있구만 <- 이거 이미지 예외처리도 해야하는 모양인데
-    
-    // 후 미칠듯
-    
+  post_crawling: async (page, category) => {    
     for (let thumnail of biobiochile.thumnail_lists[category]) {
       const connection_success = await page.goto(thumnail.thumnail_link).then(res => {
         return true;

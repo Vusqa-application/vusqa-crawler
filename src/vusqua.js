@@ -8,23 +8,16 @@ const vusqua = {
 
   initialize: async () => {
     vusqua.browser = await puppeteer.launch({
-      headless: false
-      // args: [
-      //   '--no-sandbox'
-      // ]
+      headless: false,
     });
 
     vusqua.context = await vusqua.browser.createIncognitoBrowserContext();
 
     vusqua.page = await vusqua.context.newPage();
-    
   },
   end: async () => {
     vusqua.context.close();
   },
-  saveData: async () => {
-
-  }
-}
+};
 
 module.exports = vusqua;
